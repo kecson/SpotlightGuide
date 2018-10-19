@@ -11,6 +11,7 @@ public class ViewTarget implements Target {
 
     private View view;
 
+    private int[] mLastLocation = new int[2];
 
     public ViewTarget(View view) {
         this.view = view;
@@ -18,16 +19,41 @@ public class ViewTarget implements Target {
 
     @Override
     public Point getPoint() {
-
         int[] location = new int[2];
-        view.getLocationInWindow(location);
+        view.getLocationOnScreen(location);
+        /*
+         * 修复View在ListView中，在{@link com.wooplr.spotlight.SpotlightView#show(Activity)} 之后，
+         * 再调用{@link android.widget.BaseAdapterr#notifyDataSetChanged} 之后，View被刷新后可能获取不到View的坐标的问题
+         * */
+        //可能没有绑定View显示到窗口
+        if (location[0] == 0 && location[1] == 0) {
+            location[0] = mLastLocation[0];
+            location[1] = mLastLocation[1];
+        } else {
+            //保存上一次的坐标
+            mLastLocation[0] = location[0];
+            mLastLocation[1] = location[1];
+        }
         return new Point(location[0] + (view.getWidth() / 2), location[1] + (view.getHeight() / 2));
     }
 
     @Override
     public Rect getRect() {
         int[] location = new int[2];
-        view.getLocationInWindow(location);
+        view.getLocationOnScreen(location);
+        /*
+         * 修复View在ListView中，在{@link com.wooplr.spotlight.SpotlightView#show(Activity)} 之后，
+         * 再调用{@link android.widget.BaseAdapterr#notifyDataSetChanged} 之后，View被刷新后可能获取不到View的坐标的问题
+         * */
+        //可能没有绑定View显示到窗口
+        if (location[0] == 0 && location[1] == 0) {
+            location[0] = mLastLocation[0];
+            location[1] = mLastLocation[1];
+        } else {
+            //保存上一次的坐标
+            mLastLocation[0] = location[0];
+            mLastLocation[1] = location[1];
+        }
         return new Rect(
                 location[0],
                 location[1],
@@ -35,6 +61,7 @@ public class ViewTarget implements Target {
                 location[1] + view.getHeight()
         );
     }
+
 
     @Override
     public View getView() {

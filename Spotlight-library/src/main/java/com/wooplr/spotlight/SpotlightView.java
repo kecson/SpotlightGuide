@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PathEffect;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
@@ -320,7 +321,6 @@ public class SpotlightView extends FrameLayout {
                                 public void run() {
                                     try {
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
                                             if (isRevealAnimationEnabled)
                                                 startRevealAnimation(activity);
                                             else {
@@ -364,7 +364,8 @@ public class SpotlightView extends FrameLayout {
     private void startRevealAnimation(final Activity activity) {
 
         float finalRadius = (float) Math.hypot(getViewWidth(), getHeight());
-        Animator anim = ViewAnimationUtils.createCircularReveal(this, targetView.getPoint().x, targetView.getPoint().y, 0, finalRadius);
+        Point viewPoint = targetView.getPoint();
+        Animator anim = ViewAnimationUtils.createCircularReveal(this, viewPoint.x, viewPoint.y, 0, finalRadius);
         anim.setInterpolator(AnimationUtils.loadInterpolator(activity,
                 android.R.interpolator.fast_out_linear_in));
         anim.setDuration(introAnimationDuration);
@@ -405,7 +406,8 @@ public class SpotlightView extends FrameLayout {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void exitRevealAnimation() {
         float finalRadius = (float) Math.hypot(getViewWidth(), getHeight());
-        Animator anim = ViewAnimationUtils.createCircularReveal(this, targetView.getPoint().x, targetView.getPoint().y, finalRadius, 0);
+        Point viewPoint = targetView.getPoint();
+        Animator anim = ViewAnimationUtils.createCircularReveal(this, viewPoint.x, viewPoint.y, finalRadius, 0);
         anim.setInterpolator(AnimationUtils.loadInterpolator(getContext(),
                 android.R.interpolator.accelerate_decelerate));
         anim.setDuration(introAnimationDuration);
@@ -503,25 +505,26 @@ public class SpotlightView extends FrameLayout {
 
 
         int halfHeight = mShape.getHeight() / 2;
-        if (targetView.getPoint().y > getHeight() / 2) {//bottom
-            if (targetView.getPoint().x > getWidth() / 2) {//Right
-                params.rightMargin = getWidth() - targetView.getPoint().x - halfHeight - extraPaddingForArc;
-                params.bottomMargin = getHeight() - targetView.getPoint().y - halfHeight - extraPaddingForArc;
+        Point viewPoint = targetView.getPoint();
+        if (viewPoint.y > getHeight() / 2) {//bottom
+            if (viewPoint.x > getWidth() / 2) {//Right
+                params.rightMargin = getWidth() - viewPoint.x - halfHeight - extraPaddingForArc;
+                params.bottomMargin = getHeight() - viewPoint.y - halfHeight - extraPaddingForArc;
                 params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
             } else {
-                params.leftMargin = targetView.getPoint().x - halfHeight - extraPaddingForArc;
-                params.bottomMargin = getHeight() - targetView.getPoint().y - halfHeight - extraPaddingForArc;
+                params.leftMargin = viewPoint.x - halfHeight - extraPaddingForArc;
+                params.bottomMargin = getHeight() - viewPoint.y - halfHeight - extraPaddingForArc;
                 params.gravity = Gravity.LEFT | Gravity.BOTTOM;
             }
         } else {//up
             mImageView.setRotation(180); //Reverse the view
-            if (targetView.getPoint().x > getWidth() / 2) {//Right
-                params.rightMargin = getWidth() - targetView.getPoint().x - halfHeight - extraPaddingForArc;
-                params.bottomMargin = getHeight() - targetView.getPoint().y - halfHeight - extraPaddingForArc;
+            if (viewPoint.x > getWidth() / 2) {//Right
+                params.rightMargin = getWidth() - viewPoint.x - halfHeight - extraPaddingForArc;
+                params.bottomMargin = getHeight() - viewPoint.y - halfHeight - extraPaddingForArc;
                 params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
             } else {
-                params.leftMargin = targetView.getPoint().x - halfHeight - extraPaddingForArc;
-                params.bottomMargin = getHeight() - targetView.getPoint().y - halfHeight - extraPaddingForArc;
+                params.leftMargin = viewPoint.x - halfHeight - extraPaddingForArc;
+                params.bottomMargin = getHeight() - viewPoint.y - halfHeight - extraPaddingForArc;
                 params.gravity = Gravity.LEFT | Gravity.BOTTOM;
             }
 
@@ -693,10 +696,11 @@ public class SpotlightView extends FrameLayout {
         int halfHeight = mShape.getHeight() / 2;
 
         //check up or down
-        if (targetView.getPoint().y > screenHeight / 2) {//Down TODO: add a logic for by 2
-            if (targetView.getPoint().x > screenWidth / 2) {//Right
+        Point viewPoint = targetView.getPoint();
+        if (viewPoint.y > screenHeight / 2) {//Down TODO: add a logic for by 2
+            if (viewPoint.x > screenWidth / 2) {//Right
                 animPoints.add(new AnimPoint((targetView.getViewRight() - targetView.getViewWidth() / 2),
-                        targetView.getPoint().y - halfHeight - extraPaddingForArc, (targetView.getViewRight() - targetView.getViewWidth() / 2),
+                        viewPoint.y - halfHeight - extraPaddingForArc, (targetView.getViewRight() - targetView.getViewWidth() / 2),
                         targetView.getViewTop() / 2
                 ));
                 animPoints.add(new AnimPoint((targetView.getViewRight() - targetView.getViewWidth() / 2),
@@ -720,7 +724,7 @@ public class SpotlightView extends FrameLayout {
                 subHeadingTv.setGravity(Gravity.LEFT);
 
             } else {//left
-                animPoints.add(new AnimPoint((targetView.getViewRight() - targetView.getViewWidth() / 2), targetView.getPoint().y - halfHeight - extraPaddingForArc,
+                animPoints.add(new AnimPoint((targetView.getViewRight() - targetView.getViewWidth() / 2), viewPoint.y - halfHeight - extraPaddingForArc,
                         (targetView.getViewRight() - targetView.getViewWidth() / 2),
                         targetView.getViewTop() / 2
                 ));
@@ -755,9 +759,9 @@ public class SpotlightView extends FrameLayout {
 
             }
         } else {//top
-            if (targetView.getPoint().x > screenWidth / 2) {//Right
+            if (viewPoint.x > screenWidth / 2) {//Right
                 animPoints.add(new AnimPoint(targetView.getViewRight() - targetView.getViewWidth() / 2,
-                        targetView.getPoint().y + halfHeight + extraPaddingForArc,
+                        viewPoint.y + halfHeight + extraPaddingForArc,
                         targetView.getViewRight() - targetView.getViewWidth() / 2,
                         (screenHeight - targetView.getViewBottom()) / 2 + targetView.getViewBottom()));
 
@@ -783,7 +787,7 @@ public class SpotlightView extends FrameLayout {
 
             } else {//left
                 animPoints.add(new AnimPoint(targetView.getViewRight() - targetView.getViewWidth() / 2,
-                        targetView.getPoint().y + halfHeight + extraPaddingForArc,
+                        viewPoint.y + halfHeight + extraPaddingForArc,
                         targetView.getViewRight() - targetView.getViewWidth() / 2,
                         (screenHeight - targetView.getViewBottom()) / 2 + targetView.getViewBottom()));
 
