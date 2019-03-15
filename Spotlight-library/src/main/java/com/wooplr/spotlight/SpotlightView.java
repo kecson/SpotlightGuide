@@ -25,6 +25,7 @@ import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -140,6 +141,7 @@ public class SpotlightView extends FrameLayout {
      * Perform click when user clicks on the targetView
      */
     private boolean isPerformClick;
+    private boolean isPerformLongClick;
 
     /**
      * Margin from left, right, top and bottom till the line will stop
@@ -189,6 +191,7 @@ public class SpotlightView extends FrameLayout {
     private Typeface mTypeface = null;
 
     private int softwareBtnHeight;
+    private GestureDetector mGestureDetector;
 
 
     public SpotlightView(Context context) {
@@ -221,6 +224,7 @@ public class SpotlightView extends FrameLayout {
         isRevealAnimationEnabled = true;
         dismissOnTouch = false;
         isPerformClick = false;
+        isPerformLongClick = false;
 //        enableDismissAfterShown = false;
         dismissOnBackPress = false;
         handler = new Handler();
@@ -229,6 +233,62 @@ public class SpotlightView extends FrameLayout {
         eraser.setColor(0xFFFFFFFF);
         eraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         eraser.setFlags(Paint.ANTI_ALIAS_FLAG);
+
+        mGestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent event) {
+                float xT = event.getX();
+                float yT = event.getY();
+
+                boolean isTouchOnFocus = mShape.isTouchOnFocus(xT, yT);
+                if (isTouchOnFocus && isPerformClick) {
+                    targetView.getView().setPressed(true);
+                    targetView.getView().invalidate();
+                }
+
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent event) {
+                float xT = event.getX();
+                float yT = event.getY();
+
+                boolean isTouchOnFocus = mShape.isTouchOnFocus(xT, yT);
+
+                if (isTouchOnFocus || dismissOnTouch)
+                    dismiss();
+
+                if (isTouchOnFocus && isPerformClick) {
+                    targetView.getView().performClick();
+                    targetView.getView().setPressed(true);
+                    targetView.getView().invalidate();
+                    targetView.getView().setPressed(false);
+                    targetView.getView().invalidate();
+                }
+
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent event) {
+                float xT = event.getX();
+                float yT = event.getY();
+
+                boolean isTouchOnFocus = mShape.isTouchOnFocus(xT, yT);
+                if (isTouchOnFocus || dismissOnTouch)
+                    dismiss();
+
+                if (isTouchOnFocus && isPerformLongClick) {
+                    targetView.getView().performLongClick();
+                    targetView.getView().setPressed(true);
+                    targetView.getView().invalidate();
+                    targetView.getView().setPressed(false);
+                    targetView.getView().invalidate();
+                }
+
+            }
+        });
     }
 
     @Override
@@ -265,38 +325,37 @@ public class SpotlightView extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float xT = event.getX();
-        float yT = event.getY();
-
-        boolean isTouchOnFocus = mShape.isTouchOnFocus(xT, yT);
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-
-                if (isTouchOnFocus && isPerformClick) {
-                    targetView.getView().setPressed(true);
-                    targetView.getView().invalidate();
-                }
-
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (isTouchOnFocus || dismissOnTouch)
-                    dismiss();
-
-                if (isTouchOnFocus && isPerformClick) {
-                    targetView.getView().performClick();
-                    targetView.getView().setPressed(true);
-                    targetView.getView().invalidate();
-                    targetView.getView().setPressed(false);
-                    targetView.getView().invalidate();
-                }
-
-                return true;
-            default:
-                break;
-        }
-
-        return super.onTouchEvent(event);
+//        float xT = event.getX();
+//        float yT = event.getY();
+//
+//        boolean isTouchOnFocus = mShape.isTouchOnFocus(xT, yT);
+//
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                if (isTouchOnFocus && isPerformClick) {
+//                    targetView.getView().setPressed(true);
+//                    targetView.getView().invalidate();
+//                }
+//
+//                return true;
+//            case MotionEvent.ACTION_UP:
+//                if (isTouchOnFocus || dismissOnTouch)
+//                    dismiss();
+//
+//                if (isTouchOnFocus && isPerformClick) {
+//                    targetView.getView().performClick();
+//                    targetView.getView().setPressed(true);
+//                    targetView.getView().invalidate();
+//                    targetView.getView().setPressed(false);
+//                    targetView.getView().invalidate();
+//                }
+//
+//                return true;
+//            default:
+//                break;
+//        }
+        return mGestureDetector.onTouchEvent(event);
+//        return super.onTouchEvent(event);
     }
 
 
@@ -894,6 +953,10 @@ public class SpotlightView extends FrameLayout {
         isPerformClick = performClick;
     }
 
+    public void setPerformLongClick(boolean performLongClick) {
+        isPerformLongClick = performLongClick;
+    }
+
     public void setExtraPaddingForArc(int extraPaddingForArc) {
         this.extraPaddingForArc = extraPaddingForArc;
     }
@@ -1001,6 +1064,7 @@ public class SpotlightView extends FrameLayout {
             this.dismissOnTouch = configuration.isDismissOnTouch();
             this.dismissOnBackPress = configuration.isDismissOnBackpress();
             this.isPerformClick = configuration.isPerformClick();
+            this.isPerformLongClick = configuration.isPerformLongClick();
             this.headingTvSize = configuration.getHeadingTvSize();
             this.headingTvSizeDimenUnit = configuration.getHeadingTvSizeDimenUnit();
             this.headingTvColor = configuration.getHeadingTvColor();
@@ -1103,6 +1167,10 @@ public class SpotlightView extends FrameLayout {
             return this;
         }
 
+        public Builder performLongClick(boolean isPerformLongClick) {
+            spotlightView.setPerformLongClick(isPerformLongClick);
+            return this;
+        }
 
         public Builder fadeinTextDuration(long fadinTextDuration) {
             spotlightView.setFadingTextDuration(fadinTextDuration);

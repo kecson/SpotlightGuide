@@ -18,6 +18,7 @@ public class SpotlightConfig {
     private boolean dismissOnTouch;
     private boolean dismissOnBackpress;
     private boolean isPerformClick;
+    private boolean isPerformLongClick;
     private int headingTvSize;
     private int headingTvSizeDimenUnit;
     private int headingTvColor;
@@ -39,8 +40,9 @@ public class SpotlightConfig {
         this.fadingTextDuration = 400;
         this.padding = 20;
         this.dismissOnTouch = true;
-        this.dismissOnBackpress=true;
+        this.dismissOnBackpress = true;
         this.isPerformClick = true;
+        this.isPerformLongClick = true;
         this.headingTvSize = 24;
         this.headingTvSizeDimenUnit = -1;
         this.headingTvColor = Color.parseColor("#eb273f");
@@ -109,6 +111,14 @@ public class SpotlightConfig {
 
     public void setPerformClick(boolean performClick) {
         isPerformClick = performClick;
+    }
+
+    public boolean isPerformLongClick() {
+        return isPerformLongClick;
+    }
+
+    public void setPerformLongClick(boolean performLongClick) {
+        isPerformLongClick = performLongClick;
     }
 
     public int getHeadingTvSize() {

@@ -183,6 +183,7 @@ public class SpotlightSequence {
             config.setSubHeadingTvSize(16);
             config.setSubHeadingTvColor(Color.parseColor("#ffffff"));
             config.setPerformClick(false);
+            config.setPerformLongClick(false);
             config.setRevealAnimationEnabled(true);
             config.setLineAnimationDuration(400);
         }

@@ -66,7 +66,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, "Fab Clicked!", Toast.LENGTH_LONG).show();
             }
         });
-
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast.makeText(MainActivity.this, "Fab onLongClick!", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
         switchAnimation.setOnClickListener(this);
         reset.setOnClickListener(this);
         resetAndPlay.setOnClickListener(this);
@@ -75,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                showIntro(fab, INTRO_CARD);
+                showIntro(fab, INTRO_CARD + hashCode());
             }
-        }, 2400);
+        }, 1000);
     }
 
     @Override
@@ -146,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .introAnimationDuration(400)
                 .enableRevealAnimation(isRevealEnabled)
                 .performClick(true)
+                .performLongClick(true)
                 .fadeinTextDuration(400)
                 //.setTypeface(FontUtil.get(this, "RemachineScript_Personal_Use"))
                 .headingTvColor(Color.parseColor("#eb273f"))
